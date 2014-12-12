@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset=utf-8 />
+<title>Draw &amp; animate a line on a map</title>
+<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+<script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.4/mapbox.js'></script>
+<link href='https://api.tiles.mapbox.com/mapbox.js/v2.1.4/mapbox.css' rel='stylesheet' />
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css">
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+
+<style>
+  body { margin:0; padding:0; }
+  #map { position:absolute; top:50px; bottom:0; width:100%; }
+</style>
+
+</head>
+<body>
+
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+<div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="#">Brand</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+       {% if trips_list %}
+
+        {% for trip in trips_list %}
+            <li><a href="/maps/{{ trip.id }}/">{{ trip.trip_name }}</a></li>
+
+           {% for trip_entry in trip.trip_entries.all %}
+             <p>{{ trip_entry.entry_locaiton.location_name }}</p>
+             <p>{{ trip_entry.trip_entry_desc }}</p>
+           {% endfor %}
+
+        {% endfor %}
+
+    {% else %}
+        <p>No Trips are available.</p>
+    {% endif %}
+      </ul>
+      <form class="navbar-form navbar-left" role="search">
+        <button type="submit" class="btn btn-default" onclick="add();">Submit</button>
+      </form>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="#">Link</a></li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+
+<div id='map'></div>
+
+<script>
+L.mapbox.accessToken = 'pk.eyJ1Ijoib21hcmlvIiwiYSI6IjBMRFg5a3cifQ.CNaiNsGuCeK6oaMm0MuedA';
+var map = L.mapbox.map('map', 'omario.joi7hi51')
+    .setView([27.137, 50.482], 6);
+
+// Add a new line to the map with no points.
+var polyline = L.polyline([]).addTo(map);
+
+// Keep a tally of how many points we've added to the map.
+var pointsAdded = 0;
+
+// Start drawing the polyline.
+// add();
+var i = 0;
+function add() {
+
+    // `addLatLng` takes a new latLng coordinate and puts it at the end of the
+    // line. You optionally pull points from your data or generate them. Here
+    // we make a sine wave with some math.
+    polyline.addLatLng(
+        L.latLng(
+            Math.cos(++pointsAdded / 20) * 30,
+            pointsAdded));
+
+    // Pan the map along with where the line is being added.
+    map.setView(polyline.getLatLngs()[i++], 5);
+
+    // Continue to draw and pan the map by calling `add()`
+    // until `pointsAdded` reaches 360.
+   // if (++pointsAdded < 360) window.setTimeout(add, 100);
+}
+</script>
+</body>
+</html>

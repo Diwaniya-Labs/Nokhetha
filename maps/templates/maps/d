@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+
+{% if trips_list %}
+    <ul>
+    {% for trip in trips_list %}
+        <li><a href="/maps/{{ trip.id }}/">{{ trip.trip_name }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No Trips are available.</p>
+{% endif %}
+
+</body>
+</html>

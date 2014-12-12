@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+
+{% load staticfiles %}
+
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.4/mapbox.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox.js/v2.1.4/mapbox.css' rel='stylesheet' />
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Simple Sidebar - Start Bootstrap Template</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="{% static 'maps/css/bootstrap.min.css' %}" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="{% static 'maps/css/simple-sidebar.css' %}" rel="stylesheet">
+
+
+    <style>
+      body { margin:0; padding:0; }
+      #map { position:absolute; top:0; bottom:0; left:500px; width:70%; right: 0 }
+      li, p { color: white; }
+      h1, h2, h3, h4 { color: orange; }
+    </style>
+</head>
+
+<body>
+
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        <div id="sidebar-wrapper">
+            <h3>Nokhetha Dreamin'</h3>
+            <br>
+
+            <h4>Trip Name</h4>
+            <p>{{ trip.trip_name }}</p>
+            <br>
+
+            <h4>Nokhetha</h4>
+            <p>{{ trip.nokhetha.nokhetha_name }}</p>
+            <br>
+
+            <h4>Trip Description</h4>
+            <p>{{ trip.trip_desc }}</p>
+            <br>
+
+            <h4>Trip Entries</h4>
+                <ul>
+                    {% for trip_entry in trip.trip_entries.all %}
+                        <li>
+                           <a onclick="centerOn({{ trip_entry.entry_locaiton.latitude }}, {{ trip_entry.entry_locaiton.longitude }}, '{{ trip_entry.entry_locaiton }}')" href="javascript:void(0);">{{ trip_entry.entry_date }} -  {{ trip_entry.entry_locaiton }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+
+
+
+        </div>
+        <!-- /#sidebar-wrapper -->
+
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+            <div id='map'></div>
+            <script>
+            var markers = [];
+            L.mapbox.accessToken = 'pk.eyJ1Ijoib21hcmlvIiwiYSI6IjBMRFg5a3cifQ.CNaiNsGuCeK6oaMm0MuedA';
+            var map = L.mapbox.map('map', 'omario.joi7hi51')
+                .setView([27.137, 50.482], 6);
+            {% for trip_entry in trip.trip_entries.all %}
+
+                var geojson = [
+                    {
+                      "type": "Feature",
+                      "geometry": {
+                        "coordinates": [
+                          {{trip_entry.entry_locaiton.longitude}},
+                          {{trip_entry.entry_locaiton.latitude}}
+                        ],
+                        "type": "Point"
+                      },
+                      "properties": {
+                        "title": "{{trip_entry.entry_locaiton}}",
+                        "desc": "{{trip_entry.entry_desc}}",
+                        "date": "{{trip_entry.entry_date}}",
+                        "time": "{{trip_entry.entry_time}}",
+                        "marker-color": "#1087bf",
+                        "marker-size": "large",
+                        "marker-symbol": "harbor"
+                      }
+                    }
+                ];
+
+
+                markers[{{forloop.counter|add:"-1"}}] = L.mapbox.featureLayer();
+                markers[{{forloop.counter|add:"-1"}}].setGeoJSON(geojson);
+                markers[{{forloop.counter|add:"-1"}}].addTo(map);
+
+                markers[{{forloop.counter|add:"-1"}}].eachLayer(function(layer) {
+
+                    // here you call `bindPopup` with a string of HTML you create - the feature
+                    // properties declared above are available under `layer.feature.properties`
+                    var content = '<h2>'+ layer.feature.properties.title + '<\/h2>'
+                    + layer.feature.properties.date + '<br>'
+                    + layer.feature.properties.time + '<br><br>'
+                    + layer.feature.properties.desc;
+                    layer.bindPopup(content);
+                });
+
+            {% endfor %}
+
+
+
+            // Add a new line to the map with no points.
+            var polyline = L.polyline([]).addTo(map);
+
+            // Keep a tally of how many points we've added to the map.
+            var pointsAdded = 0;
+
+            // Start drawing the polyline.
+            // add();
+            var i = 0;
+            function add() {
+
+                // `addLatLng` takes a new latLng coordinate and puts it at the end of the
+                // line. You optionally pull points from your data or generate them. Here
+                // we make a sine wave with some math.
+                polyline.addLatLng(
+                    L.latLng(
+                        Math.cos(++pointsAdded / 20) * 30,
+                        pointsAdded));
+
+                // Pan the map along with where the line is being added.
+                map.setView(polyline.getLatLngs()[i++], 5);
+
+                // Continue to draw and pan the map by calling `add()`
+                // until `pointsAdded` reaches 360.
+               // if (++pointsAdded < 360) window.setTimeout(add, 100);
+            }
+
+            function centerOn(lat, long, location)
+            {
+                map.setView([lat, long], 9);
+
+                for (i = 0; i < markers.length; i++) {
+                     markers[i].eachLayer(function(marker) {
+                            // You can replace this test for anything else, to choose the right
+                            // marker on which to open a popup. by default, popups are exclusive
+                            // so opening a new one will close all of the others.
+                            console.log(marker.feature.properties.title);
+
+                            if (marker.feature.properties.title === location ) {
+                                marker.openPopup();
+                            }
+                        });
+
+                }
+
+            }
+            </script>
+
+
+
+        </div>
+        <!-- /#page-content-wrapper -->
+
+    </div>
+    <!-- /#wrapper -->
+
+    <!-- jQuery -->
+    <script src="{% static 'maps/js/jquery.js' %}"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="{% static 'maps/js/bootstrap.min.js' %}"></script>
+
+    <!-- Menu Toggle Script -->
+    <script>
+    $("#menu-toggle").click(function(e) {
+        e.preventDefault();
+        $("#wrapper").toggleClass("toggled");
+    });
+    </script>
+
+</body>
+
+</html>
