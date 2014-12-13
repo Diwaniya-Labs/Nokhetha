@@ -3,7 +3,6 @@
 {% load staticfiles %}
 
 <html lang="en">
-
 <head>
 
     <meta charset="utf-8">
@@ -14,19 +13,16 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Simple Sidebar - Start Bootstrap Template</title>
+    <title>Nokhetha Maps</title>
 
-    <!-- Bootstrap Core CSS -->
     <link href="{% static 'maps/css/bootstrap.min.css' %}" rel="stylesheet">
 
-    <!-- Custom CSS -->
     <link href="{% static 'maps/css/simple-sidebar.css' %}" rel="stylesheet">
 
-
     <style>
-      body { margin:0; padding:0; }
-      #map { position:absolute; top:0; bottom:0; left:500px; width:70%; right: 0 }
-      li, p { color: white; }
+        body { margin:0; padding:0; }
+        #map { position:absolute; top:0; bottom:0; left:500px; width:70%; right: 0 }
+        li, p { color: white; }
       h1, h2, h3, h4 { color: orange; }
     </style>
 </head>
@@ -72,8 +68,17 @@
             <script>
             var markers = [];
             L.mapbox.accessToken = 'pk.eyJ1Ijoib21hcmlvIiwiYSI6IjBMRFg5a3cifQ.CNaiNsGuCeK6oaMm0MuedA';
-            var map = L.mapbox.map('map', 'omario.joi7hi51')
-                .setView([27.137, 50.482], 6);
+
+            var map = L.mapbox.map('map', 'omario.joi7hi51');
+            map.setView([27.137, 50.482], 6)
+            map.addControl(L.mapbox.geocoderControl('mapbox.places-v1', {
+                    autocomplete: true
+                }));
+
+             // Generate a GeoJSON line. You could also load GeoJSON via AJAX
+            // or generate it some other way.
+            var geojsonLine = { type: 'LineString', coordinates: [] };
+
             {% for trip_entry in trip.trip_entries.all %}
 
                 var geojson = [
@@ -96,12 +101,16 @@
                         "marker-symbol": "harbor"
                       }
                     }
-                ];
+            ]
 
 
                 markers[{{forloop.counter|add:"-1"}}] = L.mapbox.featureLayer();
                 markers[{{forloop.counter|add:"-1"}}].setGeoJSON(geojson);
                 markers[{{forloop.counter|add:"-1"}}].addTo(map);
+
+
+                geojsonLine.coordinates.push([ {{trip_entry.entry_locaiton.longitude}}, {{trip_entry.entry_locaiton.latitude}} ]);
+
 
                 markers[{{forloop.counter|add:"-1"}}].eachLayer(function(layer) {
 
@@ -117,56 +126,94 @@
             {% endfor %}
 
 
+            L.geoJson(geojsonLine).addTo(map);
 
-            // Add a new line to the map with no points.
-            var polyline = L.polyline([]).addTo(map);
+            // Create a marker and add it to the map.
+            var marker = L.marker([geojsonLine.coordinates[0][1], geojsonLine.coordinates[0][0]], {
+              icon: L.mapbox.marker.icon({
+                'marker-color': '#f86767'
+              })
+            }).addTo(map);
 
-            // Keep a tally of how many points we've added to the map.
-            var pointsAdded = 0;
 
-            // Start drawing the polyline.
-            // add();
-            var i = 0;
-            function add() {
+            function lineInterpolate( point1, point2, distance )
+            {
+                var xabs = Math.abs( point1.x - point2.x );
+                var yabs = Math.abs( point1.y - point2.y );
+                var xdiff = point2.x - point1.x;
+                var ydiff = point2.y - point1.y;
 
-                // `addLatLng` takes a new latLng coordinate and puts it at the end of the
-                // line. You optionally pull points from your data or generate them. Here
-                // we make a sine wave with some math.
-                polyline.addLatLng(
-                    L.latLng(
-                        Math.cos(++pointsAdded / 20) * 30,
-                        pointsAdded));
+                var length = Math.sqrt( ( Math.pow( xabs, 2 ) + Math.pow( yabs, 2 ) ) );
+                var steps = length / distance;
+                var xstep = xdiff / steps;
+                var ystep = ydiff / steps;
 
-                // Pan the map along with where the line is being added.
-                map.setView(polyline.getLatLngs()[i++], 5);
+                var newx = 0;
+                var newy = 0;
+                var result = [];
 
-                // Continue to draw and pan the map by calling `add()`
-                // until `pointsAdded` reaches 360.
-               // if (++pointsAdded < 360) window.setTimeout(add, 100);
+                for( var s = 0; s < steps; s++ )
+                {
+                    newx = point1.x + ( xstep * s );
+                    newy = point1.y + ( ystep * s );
+
+                    result.push( {
+                        x: newx,
+                        y: newy
+                    } );
+                }
+
+                return result;
             }
+
+            var j = 0;
+            var r = [];
+
+            function moveMarker(from, to) {
+                j = 0;
+
+                r = lineInterpolate(from, to, 0.08);
+
+                tick(r);
+            }
+
+            function tick()
+            {
+                if(r[j] != null)
+                {
+                    console.log(r[j].x);
+                    marker.setLatLng(L.latLng( r[j].y, r[j].x ));
+                    map.setView ([r[j].y, r[j].x], 10);
+                }
+                if (++j < r.length) setTimeout( tick , 100);
+            }
+
+            var oldPos = {x:geojsonLine.coordinates[0][0], y:geojsonLine.coordinates[0][1] };
 
             function centerOn(lat, long, location)
             {
-                map.setView([lat, long], 9);
-
+                //map.setView([lat, long], 9);
                 for (i = 0; i < markers.length; i++) {
                      markers[i].eachLayer(function(marker) {
-                            // You can replace this test for anything else, to choose the right
-                            // marker on which to open a popup. by default, popups are exclusive
-                            // so opening a new one will close all of the others.
-                            console.log(marker.feature.properties.title);
+                        // You can replace this test for anything else, to choose the right
+                        // marker on which to open a popup. by default, popups are exclusive
+                        // so opening a new one will close all of the others.
+                        //console.log(marker.feature.properties.title);
 
-                            if (marker.feature.properties.title === location ) {
-                                marker.openPopup();
-                            }
-                        });
-
+                        if (marker.feature.properties.title === location ) {
+                            marker.openPopup();
+                        }
+                     });
                 }
 
+                var newPos = { x:long, y:lat };
+
+                moveMarker(oldPos, newPos);
+
+                oldPos = newPos;
             }
+
             </script>
-
-
 
         </div>
         <!-- /#page-content-wrapper -->
@@ -180,13 +227,6 @@
     <!-- Bootstrap Core JavaScript -->
     <script src="{% static 'maps/js/bootstrap.min.js' %}"></script>
 
-    <!-- Menu Toggle Script -->
-    <script>
-    $("#menu-toggle").click(function(e) {
-        e.preventDefault();
-        $("#wrapper").toggleClass("toggled");
-    });
-    </script>
 
 </body>
 
