@@ -1,6 +1,7 @@
 from django.db import models
 from datetime import datetime
 
+
 class Nokhetha(models.Model):
     nokhetha_name = models.CharField(max_length=200)
     nokhetha_desc = models.CharField(max_length=500)
@@ -26,6 +27,7 @@ class TripEntry(models.Model):
     entry_desc = models.CharField(max_length=500)
     entry_date = models.DateField("Date", default=datetime.now, blank=True)
     entry_time = models.TimeField()
+    zoom_level = models.IntegerField(default=8)
 
     def __unicode__(self):
         return unicode(self.entry_desc)

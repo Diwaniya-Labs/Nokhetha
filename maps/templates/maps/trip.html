@@ -10,31 +10,170 @@
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
     <script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.4/mapbox.js'></script>
     <link href='https://api.tiles.mapbox.com/mapbox.js/v2.1.4/mapbox.css' rel='stylesheet' />
+    <link href="{% static 'maps/css/style.css' %}" rel='stylesheet' />
+
+
+
     <meta name="description" content="">
     <meta name="author" content="">
 
     <title>Nokhetha Maps</title>
 
-    <link href="{% static 'maps/css/bootstrap.min.css' %}" rel="stylesheet">
 
-    <link href="{% static 'maps/css/simple-sidebar.css' %}" rel="stylesheet">
-
-    <style>
-        body { margin:0; padding:0; }
-        #map { position:absolute; top:0; bottom:0; left:500px; width:70%; right: 0 }
-        li, p { color: white; }
-      h1, h2, h3, h4 { color: orange; }
-    </style>
 </head>
 
-<body>
+<div class="wrapper">
 
-    <div id="wrapper">
+	<header class="header">
+		<h2>Nokhetha Dreamin'</h2>
+	</header><!-- .header-->
 
-        <!-- Sidebar -->
-        <div id="sidebar-wrapper">
-            <h3>Nokhetha Dreamin'</h3>
-            <br>
+	<div class="middle">
+
+			<main class="content">
+                <div id='map'></div>
+
+                <script>
+                var markers = [];
+                L.mapbox.accessToken = 'pk.eyJ1Ijoib21hcmlvIiwiYSI6IjBMRFg5a3cifQ.CNaiNsGuCeK6oaMm0MuedA';
+
+                var map = L.mapbox.map('map', 'omario.joi7hi51');
+                map.setView([27.137, 50.482], 6)
+                map.addControl(L.mapbox.geocoderControl('mapbox.places-v1', {
+                        autocomplete: true
+                    }));
+
+                var geojsonLine = { type: 'LineString', coordinates: [] };
+
+                {% for trip_entry in trip.trip_entries.all %}
+
+                    var geojson = [
+                        {
+                          "type": "Feature",
+                          "geometry": {
+                            "coordinates": [
+                              {{trip_entry.entry_locaiton.longitude}},
+                              {{trip_entry.entry_locaiton.latitude}}
+                            ],
+                            "type": "Point"
+                          },
+                          "properties": {
+                            "title": "{{trip_entry.entry_locaiton}}",
+                            "desc": "{{trip_entry.entry_desc}}",
+                            "date": "{{trip_entry.entry_date}}",
+                            "time": "{{trip_entry.entry_time}}",
+                            "marker-color": "#1087bf",
+                            "marker-size": "large",
+                            "marker-symbol": "harbor"
+                          }
+                        }
+                ]
+
+
+                    markers[{{forloop.counter|add:"-1"}}] = L.mapbox.featureLayer();
+                    markers[{{forloop.counter|add:"-1"}}].setGeoJSON(geojson);
+                    markers[{{forloop.counter|add:"-1"}}].addTo(map);
+
+
+                    markers[{{forloop.counter|add:"-1"}}].eachLayer(function(layer) {
+
+                        var content = '<h2>'+ layer.feature.properties.title + '<\/h2>'
+                        + layer.feature.properties.date + '<br>'
+                        + layer.feature.properties.time + '<br><br>'
+                        + layer.feature.properties.desc;
+                        layer.bindPopup(content);
+                    });
+
+                {% endfor %}
+
+
+                var firstCords = markers[0].getGeoJSON()[0].geometry.coordinates;
+
+                // Create a marker and add it to the map.
+                var marker = L.marker([firstCords[1], firstCords[0]], {
+                  icon: L.mapbox.marker.icon({
+                    'marker-color': '#f86767'
+                  })
+                }).addTo(map);
+
+
+                function lineInterpolate( point1, point2, distance )
+                {
+                    var xabs = Math.abs( point1.x - point2.x );
+                    var yabs = Math.abs( point1.y - point2.y );
+                    var xdiff = point2.x - point1.x;
+                    var ydiff = point2.y - point1.y;
+
+                    var length = Math.sqrt( ( Math.pow( xabs, 2 ) + Math.pow( yabs, 2 ) ) );
+                    var steps = length / distance;
+                    var xstep = xdiff / steps;
+                    var ystep = ydiff / steps;
+
+                    var newx = 0;
+                    var newy = 0;
+                    var result = [];
+
+                    for( var s = 0; s < steps; s++ )
+                    {
+                        newx = point1.x + ( xstep * s );
+                        newy = point1.y + ( ystep * s );
+
+                        result.push( {
+                            x: newx,
+                            y: newy
+                        } );
+                    }
+
+                    return result;
+                }
+
+                var j = 0;
+                var r = [];
+
+                function moveMarker(from, to) {
+                    j = 0;
+
+                    r = lineInterpolate(from, to, 0.05);
+
+                    tick(r);
+                }
+
+                function tick()
+                {
+                    if(r[j] != null)
+                    {
+                        marker.setLatLng(L.latLng( r[j].y, r[j].x ));
+                        geojsonLine.coordinates.push([ r[j].x, r[j].y ]);
+                        L.geoJson(geojsonLine).addTo(map);
+                        //map.setView ([r[j].y, r[j].x], 10);
+                    }
+                    if (++j < r.length) setTimeout( tick , 50);
+                }
+
+                var oldPos = {x:firstCords[0], y:firstCords[1] };
+
+                function centerOn(lat, long, location, zoom)
+                {
+                    map.setView([lat, long], zoom);
+                    for (i = 0; i < markers.length; i++) {
+                         markers[i].eachLayer(function(marker) {
+                            if (marker.feature.properties.title === location ) {
+                                marker.openPopup();
+                            }
+                         });
+                    }
+
+                    var newPos = { x:long, y:lat };
+
+                    moveMarker(oldPos, newPos);
+
+                    oldPos = newPos;
+                }
+
+                </script>
+			</main><!-- .content -->
+
+		<aside class="left-sidebar">
 
             <h4>Trip Name</h4>
             <p>{{ trip.trip_name }}</p>
@@ -52,182 +191,76 @@
                 <ul>
                     {% for trip_entry in trip.trip_entries.all %}
                         <li>
-                           <a onclick="centerOn({{ trip_entry.entry_locaiton.latitude }}, {{ trip_entry.entry_locaiton.longitude }}, '{{ trip_entry.entry_locaiton }}')" href="javascript:void(0);">{{ trip_entry.entry_date }} -  {{ trip_entry.entry_locaiton }}</a>
+                           <a onclick="centerOn({{ trip_entry.entry_locaiton.latitude }}, {{ trip_entry.entry_locaiton.longitude }}, '{{ trip_entry.entry_locaiton }}', {{trip_entry.zoom_level }})" href="javascript:void(0);">{{ trip_entry.entry_date }} -  {{ trip_entry.entry_locaiton }}</a>
                         </li>
                     {% endfor %}
                 </ul>
 
 
 
-        </div>
-        <!-- /#sidebar-wrapper -->
 
-        <!-- Page Content -->
-        <div id="page-content-wrapper">
-            <div id='map'></div>
-            <script>
-            var markers = [];
-            L.mapbox.accessToken = 'pk.eyJ1Ijoib21hcmlvIiwiYSI6IjBMRFg5a3cifQ.CNaiNsGuCeK6oaMm0MuedA';
+		</aside><!-- .left-sidebar -->
 
-            var map = L.mapbox.map('map', 'omario.joi7hi51');
-            map.setView([27.137, 50.482], 6)
-            map.addControl(L.mapbox.geocoderControl('mapbox.places-v1', {
-                    autocomplete: true
-                }));
+	</div><!-- .middle-->
 
-             // Generate a GeoJSON line. You could also load GeoJSON via AJAX
-            // or generate it some other way.
-            var geojsonLine = { type: 'LineString', coordinates: [] };
+	<footer class="footer">
+		<strong>Footer:</strong> Mus elit Morbi mus enim lacus at quis Nam eget morbi. Et semper urna urna non at cursus dolor vestibulum neque enim. Tellus interdum at laoreet laoreet lacinia lacinia sed Quisque justo quis. Hendrerit scelerisque lorem elit orci tempor tincidunt enim Phasellus dignissim tincidunt. Nunc vel et Sed nisl Vestibulum odio montes Aliquam volutpat pellentesque. Ut pede sagittis et quis nunc gravida porttitor ligula.
+	</footer><!-- .footer -->
 
-            {% for trip_entry in trip.trip_entries.all %}
+</div><!-- .wrapper -->
 
-                var geojson = [
-                    {
-                      "type": "Feature",
-                      "geometry": {
-                        "coordinates": [
-                          {{trip_entry.entry_locaiton.longitude}},
-                          {{trip_entry.entry_locaiton.latitude}}
-                        ],
-                        "type": "Point"
-                      },
-                      "properties": {
-                        "title": "{{trip_entry.entry_locaiton}}",
-                        "desc": "{{trip_entry.entry_desc}}",
-                        "date": "{{trip_entry.entry_date}}",
-                        "time": "{{trip_entry.entry_time}}",
-                        "marker-color": "#1087bf",
-                        "marker-size": "large",
-                        "marker-symbol": "harbor"
-                      }
-                    }
-            ]
+<!--
+<body>
+
+    &lt;!&ndash; Sidebar &ndash;&gt;
+    <div id="sidebar-wrapper">
+        <h3>Nokhetha Dreamin'</h3>
+        <br>
+
+        <h4>Trip Name</h4>
+        <p>{{ trip.trip_name }}</p>
+        <br>
+
+        <h4>Nokhetha</h4>
+        <p>{{ trip.nokhetha.nokhetha_name }}</p>
+        <br>
+
+        <h4>Trip Description</h4>
+        <p>{{ trip.trip_desc }}</p>
+        <br>
+
+        <h4>Trip Entries</h4>
+            <ul>
+                {% for trip_entry in trip.trip_entries.all %}
+                    <li>
+                       <a onclick="centerOn({{ trip_entry.entry_locaiton.latitude }}, {{ trip_entry.entry_locaiton.longitude }}, '{{ trip_entry.entry_locaiton }}', {{trip_entry.zoom_level }})" href="javascript:void(0);">{{ trip_entry.entry_date }} -  {{ trip_entry.entry_locaiton }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
 
 
-                markers[{{forloop.counter|add:"-1"}}] = L.mapbox.featureLayer();
-                markers[{{forloop.counter|add:"-1"}}].setGeoJSON(geojson);
-                markers[{{forloop.counter|add:"-1"}}].addTo(map);
-
-
-                geojsonLine.coordinates.push([ {{trip_entry.entry_locaiton.longitude}}, {{trip_entry.entry_locaiton.latitude}} ]);
-
-
-                markers[{{forloop.counter|add:"-1"}}].eachLayer(function(layer) {
-
-                    // here you call `bindPopup` with a string of HTML you create - the feature
-                    // properties declared above are available under `layer.feature.properties`
-                    var content = '<h2>'+ layer.feature.properties.title + '<\/h2>'
-                    + layer.feature.properties.date + '<br>'
-                    + layer.feature.properties.time + '<br><br>'
-                    + layer.feature.properties.desc;
-                    layer.bindPopup(content);
-                });
-
-            {% endfor %}
-
-
-            L.geoJson(geojsonLine).addTo(map);
-
-            // Create a marker and add it to the map.
-            var marker = L.marker([geojsonLine.coordinates[0][1], geojsonLine.coordinates[0][0]], {
-              icon: L.mapbox.marker.icon({
-                'marker-color': '#f86767'
-              })
-            }).addTo(map);
-
-
-            function lineInterpolate( point1, point2, distance )
-            {
-                var xabs = Math.abs( point1.x - point2.x );
-                var yabs = Math.abs( point1.y - point2.y );
-                var xdiff = point2.x - point1.x;
-                var ydiff = point2.y - point1.y;
-
-                var length = Math.sqrt( ( Math.pow( xabs, 2 ) + Math.pow( yabs, 2 ) ) );
-                var steps = length / distance;
-                var xstep = xdiff / steps;
-                var ystep = ydiff / steps;
-
-                var newx = 0;
-                var newy = 0;
-                var result = [];
-
-                for( var s = 0; s < steps; s++ )
-                {
-                    newx = point1.x + ( xstep * s );
-                    newy = point1.y + ( ystep * s );
-
-                    result.push( {
-                        x: newx,
-                        y: newy
-                    } );
-                }
-
-                return result;
-            }
-
-            var j = 0;
-            var r = [];
-
-            function moveMarker(from, to) {
-                j = 0;
-
-                r = lineInterpolate(from, to, 0.08);
-
-                tick(r);
-            }
-
-            function tick()
-            {
-                if(r[j] != null)
-                {
-                    console.log(r[j].x);
-                    marker.setLatLng(L.latLng( r[j].y, r[j].x ));
-                    map.setView ([r[j].y, r[j].x], 10);
-                }
-                if (++j < r.length) setTimeout( tick , 100);
-            }
-
-            var oldPos = {x:geojsonLine.coordinates[0][0], y:geojsonLine.coordinates[0][1] };
-
-            function centerOn(lat, long, location)
-            {
-                //map.setView([lat, long], 9);
-                for (i = 0; i < markers.length; i++) {
-                     markers[i].eachLayer(function(marker) {
-                        // You can replace this test for anything else, to choose the right
-                        // marker on which to open a popup. by default, popups are exclusive
-                        // so opening a new one will close all of the others.
-                        //console.log(marker.feature.properties.title);
-
-                        if (marker.feature.properties.title === location ) {
-                            marker.openPopup();
-                        }
-                     });
-                }
-
-                var newPos = { x:long, y:lat };
-
-                moveMarker(oldPos, newPos);
-
-                oldPos = newPos;
-            }
-
-            </script>
-
-        </div>
-        <!-- /#page-content-wrapper -->
 
     </div>
-    <!-- /#wrapper -->
+    &lt;!&ndash; /#sidebar-wrapper &ndash;&gt;
 
-    <!-- jQuery -->
+    &lt;!&ndash; Page Content &ndash;&gt;
+    <div id="page-content-wrapper">
+
+
+    &lt;!&ndash; /#page-content-wrapper &ndash;&gt;
+
+
+    </div>
+        <footer class="site-footer">I'm the Sticky Footer.</footer>
+    &lt;!&ndash; /#wrapper &ndash;&gt;
+
+    &lt;!&ndash; jQuery &ndash;&gt;
     <script src="{% static 'maps/js/jquery.js' %}"></script>
 
-    <!-- Bootstrap Core JavaScript -->
+    &lt;!&ndash; Bootstrap Core JavaScript &ndash;&gt;
     <script src="{% static 'maps/js/bootstrap.min.js' %}"></script>
 
 
-</body>
+</body>-->
 
 </html>
