@@ -69,8 +69,11 @@
             var markers = [];
             L.mapbox.accessToken = 'pk.eyJ1Ijoib21hcmlvIiwiYSI6IjBMRFg5a3cifQ.CNaiNsGuCeK6oaMm0MuedA';
 
-            var map = L.mapbox.map('map', 'omario.joi7hi51')
-                .setView([27.137, 50.482], 6);
+            var map = L.mapbox.map('map', 'omario.joi7hi51');
+            map.setView([27.137, 50.482], 6)
+            map.addControl(L.mapbox.geocoderControl('mapbox.places-v1', {
+                    autocomplete: true
+                }));
 
              // Generate a GeoJSON line. You could also load GeoJSON via AJAX
             // or generate it some other way.
@@ -125,8 +128,6 @@
 
             L.geoJson(geojsonLine).addTo(map);
 
-
-
             // Create a marker and add it to the map.
             var marker = L.marker([geojsonLine.coordinates[0][1], geojsonLine.coordinates[0][0]], {
               icon: L.mapbox.marker.icon({
@@ -171,7 +172,7 @@
             function moveMarker(from, to) {
                 j = 0;
 
-                r = lineInterpolate(from, to, 0.01);
+                r = lineInterpolate(from, to, 0.08);
 
                 tick(r);
             }
@@ -182,15 +183,16 @@
                 {
                     console.log(r[j].x);
                     marker.setLatLng(L.latLng( r[j].y, r[j].x ));
+                    map.setView ([r[j].y, r[j].x], 10);
                 }
-                if (j++ < r.length) setTimeout( tick , 10);
+                if (++j < r.length) setTimeout( tick , 100);
             }
 
             var oldPos = {x:geojsonLine.coordinates[0][0], y:geojsonLine.coordinates[0][1] };
 
             function centerOn(lat, long, location)
             {
-                map.setView([lat, long], 9);
+                //map.setView([lat, long], 9);
                 for (i = 0; i < markers.length; i++) {
                      markers[i].eachLayer(function(marker) {
                         // You can replace this test for anything else, to choose the right
@@ -225,13 +227,6 @@
     <!-- Bootstrap Core JavaScript -->
     <script src="{% static 'maps/js/bootstrap.min.js' %}"></script>
 
-    <!-- Menu Toggle Script -->
-    <script>
-    $("#menu-toggle").click(function(e) {
-        e.preventDefault();
-        $("#wrapper").toggleClass("toggled");
-    });
-    </script>
 
 </body>
 
