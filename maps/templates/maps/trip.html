@@ -44,6 +44,7 @@
                     }));
 
                 var geojsonLine = { type: 'LineString', coordinates: [] };
+                var currentEntry = 0;
 
                 {% for trip_entry in trip.trip_entries.all %}
 
@@ -62,6 +63,7 @@
                             "desc": "{{trip_entry.entry_desc}}",
                             "date": "{{trip_entry.entry_date}}",
                             "time": "{{trip_entry.entry_time}}",
+                            "zoom": "{{trip_entry.zoom_level}}",
                             "marker-color": "#1087bf",
                             "marker-size": "large",
                             "marker-symbol": "harbor"
@@ -168,6 +170,38 @@
                     moveMarker(oldPos, newPos);
 
                     oldPos = newPos;
+
+                }
+
+                function setEntry(entryIndex)
+                {
+                    if (entryIndex >= 0 && entryIndex+1 <= markers.length)
+                    {
+                        currentEntry = entryIndex;
+                        document.getElementById("current_entry").innerHTML = currentEntry+1;
+                        var target = markers[currentEntry].getGeoJSON()[0];
+                        centerOn(target.geometry.coordinates[1], target.geometry.coordinates[0], target.properties.title, target.properties.zoom);
+                        document.getElementById("footer").innerHTML = target.properties.title + ' - ' + target.properties.date + '  - ' + target.properties.time + '<br>' + target.properties.desc;
+
+                    }
+                }
+
+
+                function prevEntry(){
+                    if (currentEntry === 0)
+                        return;
+
+                    --currentEntry;
+                    setEntry(entryIndex);
+                }
+
+
+                function nextEntry(){
+                    if (currentEntry+1 >= markers.length)
+                        return;
+
+                    ++currentEntry;
+                    setEntry(currentEntry);
                 }
 
                 </script>
@@ -188,79 +222,31 @@
             <br>
 
             <h4>Trip Entries</h4>
-                <ul>
-                    {% for trip_entry in trip.trip_entries.all %}
-                        <li>
-                           <a onclick="centerOn({{ trip_entry.entry_locaiton.latitude }}, {{ trip_entry.entry_locaiton.longitude }}, '{{ trip_entry.entry_locaiton }}', {{trip_entry.zoom_level }})" href="javascript:void(0);">{{ trip_entry.entry_date }} -  {{ trip_entry.entry_locaiton }}</a>
-                        </li>
-                    {% endfor %}
-                </ul>
+            <ul>
+                {% for trip_entry in trip.trip_entries.all %}
+                    <li>
+                       <a onclick="setEntry({{ forloop.counter0 }})" href="javascript:void(0);">{{ trip_entry.entry_date }} -  {{ trip_entry.entry_locaiton }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
 
+            <a onclick="prevEntry()" class="pagination-left" href="javascript:void(0);">Prev</a>
 
+            <p id="current_entry" class="pagination-current_entry">1</p>
+            <p class="pagination-all_entries"> of &nbsp;{{ trip.trip_entries.all.count }} </p>
+
+            <a onclick="nextEntry()" class="pagination-right" href="javascript:void(0);">Next</a>
 
 
 		</aside><!-- .left-sidebar -->
 
 	</div><!-- .middle-->
 
-	<footer class="footer">
-		<strong>Footer:</strong> Mus elit Morbi mus enim lacus at quis Nam eget morbi. Et semper urna urna non at cursus dolor vestibulum neque enim. Tellus interdum at laoreet laoreet lacinia lacinia sed Quisque justo quis. Hendrerit scelerisque lorem elit orci tempor tincidunt enim Phasellus dignissim tincidunt. Nunc vel et Sed nisl Vestibulum odio montes Aliquam volutpat pellentesque. Ut pede sagittis et quis nunc gravida porttitor ligula.
+	<footer id = "footer" class="footer">
+        Test words
 	</footer><!-- .footer -->
 
 </div><!-- .wrapper -->
 
-<!--
-<body>
-
-    &lt;!&ndash; Sidebar &ndash;&gt;
-    <div id="sidebar-wrapper">
-        <h3>Nokhetha Dreamin'</h3>
-        <br>
-
-        <h4>Trip Name</h4>
-        <p>{{ trip.trip_name }}</p>
-        <br>
-
-        <h4>Nokhetha</h4>
-        <p>{{ trip.nokhetha.nokhetha_name }}</p>
-        <br>
-
-        <h4>Trip Description</h4>
-        <p>{{ trip.trip_desc }}</p>
-        <br>
-
-        <h4>Trip Entries</h4>
-            <ul>
-                {% for trip_entry in trip.trip_entries.all %}
-                    <li>
-                       <a onclick="centerOn({{ trip_entry.entry_locaiton.latitude }}, {{ trip_entry.entry_locaiton.longitude }}, '{{ trip_entry.entry_locaiton }}', {{trip_entry.zoom_level }})" href="javascript:void(0);">{{ trip_entry.entry_date }} -  {{ trip_entry.entry_locaiton }}</a>
-                    </li>
-                {% endfor %}
-            </ul>
-
-
-
-    </div>
-    &lt;!&ndash; /#sidebar-wrapper &ndash;&gt;
-
-    &lt;!&ndash; Page Content &ndash;&gt;
-    <div id="page-content-wrapper">
-
-
-    &lt;!&ndash; /#page-content-wrapper &ndash;&gt;
-
-
-    </div>
-        <footer class="site-footer">I'm the Sticky Footer.</footer>
-    &lt;!&ndash; /#wrapper &ndash;&gt;
-
-    &lt;!&ndash; jQuery &ndash;&gt;
-    <script src="{% static 'maps/js/jquery.js' %}"></script>
-
-    &lt;!&ndash; Bootstrap Core JavaScript &ndash;&gt;
-    <script src="{% static 'maps/js/bootstrap.min.js' %}"></script>
-
-
-</body>-->
 
 </html>

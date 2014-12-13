@@ -58,6 +58,26 @@ body {
 
         h1, h2, h3, h4 { color: #5d9ed8; }
 
+.pagination-left, .pagination-right, .pagination-all_entries, .pagination-current_entry
+{
+	bottom: 10px;
+	position: absolute;
+}
+
+.pagination-right
+{
+	right: 10px;
+}
+
+.pagination-all_entries
+{
+	right: 120px;
+}
+
+.pagination-current_entry
+{
+	right: 150px;
+}
 
 /* Header
 -----------------------------------------------------------------------------*/
@@ -130,4 +150,5 @@ a:link {
     box-sizing: border-box;
     padding: 10px;
     color: #ffffff;
+	text-align: center;
 }
