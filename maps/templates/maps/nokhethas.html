@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+
+<html class="fullscreen">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<link rel="shortcut icon" href="{% static 'maps/img/favicon.ico' %}" type="image/x-icon">
+<title>Nokhetha Maps | Historical Maps from ancient Times</title>
+<link href="http://fonts.googleapis.com/css?family=Roboto:400,700,400italic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=Muli" rel="stylesheet" type="text/css">
+<link rel="stylesheet" href="{% static 'maps/css/theme.css' %}" type="text/css" media="all" />
+<link rel="stylesheet" href="{% static 'maps/css/responsive.css' %}" type="text/css" media="all" />
+<link rel="stylesheet" href="{% static 'maps/css/custom.css' %}" type="text/css" media="all" />
+</head>
+<body>
+	<header class="main_header">
+    	<div class="header_scroll">
+            <div class="header_wrapper">
+            	<a href="../../../../maps/" class="logo"><img src="{% static 'maps/img/logo.png' %}" alt="" class="logo_def"><img src="{% static 'maps/img/retina/logo.png' %}" alt="" class="logo_retina"></a>
+                <nav>
+                	<div class="menu-main-menu-container">
+                    	<ul id="menu-main-menu" class="menu">
+                        	<li><a href="../../../../maps/"><span>Home</span></a></li>
+                        	<li class="current-menu-item"><a href="#"><span>Nokhethas</span></a></li>
+                        	<li><a href="#"><span>Trips</span></a></li>
+                            <li><a href="about.html"><span>About</span></a></li>
+                        </ul>
+                    </div>
+                </nav>
+                <div class="widget_area">
+                    <div class="span12">
+                    	<div class="sidepanel widget_text">
+                        	<div class="textwidget">
+                            	<div class="center_text">
+                                	<img src="{% static 'maps/img/imgs/widget.jpg' %}" alt="" class="header_widget" />
+                                    <h6>Hello And Welcome</h6>
+                                    to the Nokhetha Maps Website! Glad to see you here!
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- Header Wrapper -->
+            <div class="footer_wrapper">
+                <div class="socials_wrapper">
+                    <ul class="socials_list">
+                    	<li><a class="ico_social_facebook" target="_blank" href="http://facebook.com" title="Facebook"></a></li>
+                        <li><a class="ico_social_pinterest" target="_blank" href="http://pinterest.com" title="Pinterest"></a></li>
+                        <li><a class="ico_social_instagram" target="_blank" href="http://instagram.com" title="Instagram"></a></li>
+                        <li><a class="ico_social_flickr" target="_blank" href="http://flickr.com" title="Flickr"></a></li>
+                    </ul>
+                </div>
+                <div class="copyright">Copyright &copy; Diwaniya Labs.<br>All Rights Reserved</div>
+            </div><!-- footer_wrapper -->
+    	</div>
+	</header>
+
+    <div class="fullscreen_block hided">
+        <div class="fs_blog_module fw_port_module sorting_block">
+
+            <!-- BEGIN NOKHETHAS -->
+             {% if nokhetha_list %}
+
+                {% for nokhetha in nokhetha_list %}
+                <div class="blogpost_preview_fw fw-portPreview element nature">
+                    <div class="fw-portPreview-wrapper mas_style1 pr40 pb40">
+                        <a href="/maps/nokhetha/{{ nokhetha.id }}">
+                            <img src="{% static 'maps/img/portfolio/grid/1.jpg' %}" alt="" class="fw_featured_image" width="540">
+                            <div class="fw-portPreview-fadder"></div>
+                            <div class="fw-portPreview-content">
+                                <h2 class="fw-portPreview-title">{{ nokhetha.nokhetha_name }}</h2>
+                                <div class="block_likes">
+                                    <div class="fw-portPreview-views">
+                                         <span>{{ nokhetha.active_year_from }} - {{ nokhetha.active_year_to }}</span>
+                                    </div>
+                                    <div class="fw-portPreview-likes">
+                                         <span>7 Trips</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                {% endfor %}
+
+            {% else %}
+                <p>No Nokhs are Defined.</p>
+            {% endif %}
+
+
+            <!-- END NOKHETHAS -->
+
+        	<div class="clear"></div>
+        </div>
+    </div>
+
+    <div class="custom_bg img_bg def_bg"></div>
+
+    <script type="text/javascript" src="{% static 'maps/js/jquery.min.js' %}"></script>
+	<script type="text/javascript" src="{% static 'maps/js/jquery-ui.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'maps/js/modules.js' %}"></script>
+	<script type="text/javascript" src="{% static 'maps/js/theme.js' %}"></script>
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="js/modules.js"></script>
+	<script type="text/javascript" src="js/theme.js"></script>
+    <script>
+
+		jQuery(document).ready(function(){
+			"use strict";
+			setUpWindow();
+
+			jQuery('.portfolio_title').each(function(){
+				jQuery(this).css('margin-top', -1*jQuery(this).height()/2+'px');
+			});
+
+			if (jQuery('.pagerblock').size() > 0) {
+				jQuery('.pagerblock').addClass('type_columns1');
+			}
+		});
+		jQuery(window).load(function(){
+			"use strict";
+			setUpWindow();
+		});
+		jQuery(window).resize(function(){
+			"use strict";
+			setUpWindow();
+			setTimeout('setUpWindow()',500);
+			setTimeout('setUpWindow()',1000);
+		});
+		function setUpWindow() {
+			"use strict";
+			main_wrapper.css('min-height', window_h-parseInt(site_wrapper.css('padding-top')) - parseInt(site_wrapper.css('padding-bottom'))+'px');
+		}
+	</script>
+
+</body>
+</html>

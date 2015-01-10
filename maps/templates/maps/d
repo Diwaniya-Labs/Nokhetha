@@ -1,20 +1,72 @@
 <!DOCTYPE html>
-<html>
-<head lang="en">
-    <meta charset="UTF-8">
-    <title></title>
+
+{% load staticfiles %}
+
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.4/mapbox.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox.js/v2.1.4/mapbox.css' rel='stylesheet' />
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Simple Sidebar - Start Bootstrap Template</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="{% static 'maps/css/bootstrap.min.css' %}" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="{% static 'maps/css/simple-sidebar.css' %}" rel="stylesheet">
+
+
+    <style>
+      body { margin:0; padding:0; }
+      #map { position:absolute; top:0; bottom:0; left:250px; width:inherit; right: 0 }
+      p, h1, h2, h3 { color: white; }
+    </style>
 </head>
+
 <body>
 
-{% if trips_list %}
-    <ul>
-    {% for trip in trips_list %}
-        <li><a href="/maps/{{ trip.id }}/">{{ trip.trip_name }}</a></li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>No Trips are available.</p>
-{% endif %}
+    <div id="wrapper">
+
+        {% if trips_list %}
+
+        {% for trip in trips_list %}
+            <li><a href="/maps/{{ trip.id }}/">{{ trip.trip_name }}</a></li>
+
+           {% for trip_entry in trip.trip_entries.all %}
+             <p>{{ trip_entry.entry_locaiton.location_name }}</p>
+             <p>{{ trip_entry.trip_entry_desc }}</p>
+           {% endfor %}
+
+        {% endfor %}
+
+    {% else %}
+        <p>No Trips are available.</p>
+    {% endif %}
+
+    </div>
+    <!-- /#wrapper -->
+
+    <!-- jQuery -->
+    <script src="{% static 'maps/js/jquery.js' %}"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="{% static 'maps/js/bootstrap.min.js' %}"></script>
+
+    <!-- Menu Toggle Script -->
+    <script>
+    $("#menu-toggle").click(function(e) {
+        e.preventDefault();
+        $("#wrapper").toggleClass("toggled");
+    });
+    </script>
 
 </body>
+
 </html>

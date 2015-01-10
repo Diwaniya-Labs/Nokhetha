@@ -1,72 +1,168 @@
 <!DOCTYPE html>
-
 {% load staticfiles %}
 
-<html lang="en">
-
+<html class="fullscreen">
 <head>
-
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
-    <script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.4/mapbox.js'></script>
-    <link href='https://api.tiles.mapbox.com/mapbox.js/v2.1.4/mapbox.css' rel='stylesheet' />
-    <meta name="description" content="">
-    <meta name="author" content="">
-
-    <title>Simple Sidebar - Start Bootstrap Template</title>
-
-    <!-- Bootstrap Core CSS -->
-    <link href="{% static 'maps/css/bootstrap.min.css' %}" rel="stylesheet">
-
-    <!-- Custom CSS -->
-    <link href="{% static 'maps/css/simple-sidebar.css' %}" rel="stylesheet">
-
-
-    <style>
-      body { margin:0; padding:0; }
-      #map { position:absolute; top:0; bottom:0; left:250px; width:inherit; right: 0 }
-      p, h1, h2, h3 { color: white; }
-    </style>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<link rel="shortcut icon" href="{% static 'maps/img/favicon.ico' %}" type="image/x-icon">
+<title>Nokhetha Maps | Historical Maps from ancient Times</title>
+<link href="http://fonts.googleapis.com/css?family=Roboto:400,700,400italic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=Muli" rel="stylesheet" type="text/css">
+<link rel="stylesheet" href="{% static 'maps/css/theme.css' %}" type="text/css" media="all" />
+<link rel="stylesheet" href="{% static 'maps/css/responsive.css' %}" type="text/css" media="all" />
+<link rel="stylesheet" href="{% static 'maps/css/custom.css' %}" type="text/css" media="all" />
 </head>
-
 <body>
+	<header class="main_header">
+    	<div class="header_scroll">
+            <div class="header_wrapper">
+            	<a href="index.html" class="logo"><img src="{% static 'maps/img/logo.png' %}" alt="" class="logo_def"><img src="{% static 'maps/img/retina/logo.png' %}" alt="" class="logo_retina"></a>
+                <nav>
+                	<div class="menu-main-menu-container">
+                    	<ul id="menu-main-menu" class="menu">
+                        	<li class="current-menu-item"><a href="#"><span>Home</span></a></li>
+                        	<li><a href="/maps/nokhethas/"><span>Nokhethas</span></a></li>
+                        	<li><a href="/maps/trips/"><span>Trips</span></a></li>
+                            <li><a href="/maps/about/"><span>About</span></a></li>
+                        </ul>
+                    </div>
+                </nav>
+                <div class="widget_area">
+                    <div class="span12">
+                    	<div class="sidepanel widget_text">
+                        	<div class="textwidget">
+                            	<div class="center_text">
+                                	<img src="{% static 'maps/img/imgs/widget.jpg' %}" alt="" class="header_widget" />
+                                    <h6>Hello And Welcome</h6>
+                                    to the Nokhetha Maps Website! Glad to see you here!
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- Header Wrapper -->
+            <div class="footer_wrapper">
+                <div class="socials_wrapper">
+                    <ul class="socials_list">
+                    	<li><a class="ico_social_facebook" target="_blank" href="http://facebook.com" title="Facebook"></a></li>
+                        <li><a class="ico_social_pinterest" target="_blank" href="http://pinterest.com" title="Pinterest"></a></li>
+                        <li><a class="ico_social_instagram" target="_blank" href="http://instagram.com" title="Instagram"></a></li>
+                        <li><a class="ico_social_flickr" target="_blank" href="http://flickr.com" title="Flickr"></a></li>
+                    </ul>
+                </div>
+                <div class="copyright">Copyright &copy; Diwaniya Labs.<br>All Rights Reserved</div>
+            </div><!-- footer_wrapper -->
+    	</div>
+	</header>
 
-    <div id="wrapper">
+    <div class="fullscreen_block hasPreloader">
+	    <div class="fs_blog_module is_masonry this_is_blog">
+        	<div class="blogpost_preview_fw">
+                <div class="fw_preview_wrapper featured_items">
+                    <div class="img_block wrapped_img">
+                        <a class="featured_ico_link" href="fullwidth_post.html">
+                            <div class="pf_output_container"><img class="featured_image_standalone" src="{% static 'maps/img/blog/fullscreen/1.jpg' %}" alt="" /></div>
+                            <div class="featured_item_fadder"></div>
+                        </a>
+                        <div class="gallery_likes gallery_likes_add">
+                            <span>More...</span>
+                        </div>
+                    </div>
+                    <div class="fw_blog_content">
+                        <h4 class="blogpost_title"><a href="fullwidth_post.html">Nokhetha Trip</a></h4>
+                        <article class="contentarea">
+                        	Lobortis diam, gravida feugiat a nulla nisl a eros phasellus consectetur adipiscing elit. Morbi facilisis, arcu ac eget malesuada malesuada sodio.
+                        </article>
+                        <div class="blogpreview_top">
+                            <div class="listing_meta">
+                                <span><i class="stand_icon icon-calendar-o"></i>March 04, 2014</span>
+                                <span><i class="icon-folder"></i><a href="javascript:void(0);">Nature</a></span>
+                                <span><i class="icon-comments"></i><a href="javascript:void(0);">3</a></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-        {% if trips_list %}
+            <div class="blogpost_preview_fw">
+                <div class="fw_preview_wrapper featured_items">
+                    <div class="img_block wrapped_img">
+                        <a class="featured_ico_link" href="fullwidth_post.html">
+                            <div class="pf_output_container"><img class="featured_image_standalone" src="{% static 'maps/img/blog/fullscreen/2.jpg' %}" alt="" /></div>
+                            <div class="featured_item_fadder"></div>
+                        </a>
+                        <div class="gallery_likes gallery_likes_add">
+                            <i class="stand_icon icon-heart-o"></i>
+                            <span>34</span>
+                        </div>
+                    </div>
+                    <div class="fw_blog_content">
+                        <h4 class="blogpost_title"><a href="fullwidth_post.html">Photographer Anna White</a></h4>
+                        <article class="contentarea">
+                            Consectetur adipiscing elit. Morbi facilisis, arcu ac eget malesuada malesuada, sodio sem lobortis diam, gravida feugiat a nulla nisl a eros phasellus.                        </article>
+                        <div class="blogpreview_top">
+                            <div class="listing_meta">
+                                <span><i class="stand_icon icon-calendar-o"></i>March 04, 2014</span>
+                                <span><i class="icon-folder"></i><a href="javascript:void(0);">Cities</a>, <a href="javascript:void(0);">Stuff</a></span>
+                                <span><i class="icon-comments"></i><a href="javascript:void(0);">3</a></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-        {% for trip in trips_list %}
-            <li><a href="/maps/{{ trip.id }}/">{{ trip.trip_name }}</a></li>
 
-           {% for trip_entry in trip.trip_entries.all %}
-             <p>{{ trip_entry.entry_locaiton.location_name }}</p>
-             <p>{{ trip_entry.trip_entry_desc }}</p>
-           {% endfor %}
+    	</div>
+	</div>
 
-        {% endfor %}
+    <div class="custom_bg img_bg def_bg"></div>
 
-    {% else %}
-        <p>No Trips are available.</p>
-    {% endif %}
-
-    </div>
-    <!-- /#wrapper -->
-
-    <!-- jQuery -->
-    <script src="{% static 'maps/js/jquery.js' %}"></script>
-
-    <!-- Bootstrap Core JavaScript -->
-    <script src="{% static 'maps/js/bootstrap.min.js' %}"></script>
-
-    <!-- Menu Toggle Script -->
+    <script type="text/javascript" src="{% static 'maps/js/jquery.min.js' %}"></script>
+	<script type="text/javascript" src="{% static 'maps/js/jquery-ui.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'maps/js/modules.js' %}"></script>
+	<script type="text/javascript" src="{% static 'maps/js/theme.js' %}"></script>
     <script>
-    $("#menu-toggle").click(function(e) {
-        e.preventDefault();
-        $("#wrapper").toggleClass("toggled");
-    });
-    </script>
+		jQuery(window).resize(function () {
+			"use strict";
+			jQuery('.is_masonry').masonry();
+        });
+		jQuery(document).ready(function($){
+			"use strict";
+			jQuery('.custom_bg').remove();
+			jQuery('.is_masonry').masonry();
+			setTimeout("jQuery('.is_masonry').masonry();",1000);
+			setTimeout("jQuery('.is_masonry').masonry();",2000);
+		});
+	</script>
+    <script>
 
+		jQuery(document).ready(function(){
+			"use strict";
+			setUpWindow();
+
+			jQuery('.portfolio_title').each(function(){
+				jQuery(this).css('margin-top', -1*jQuery(this).height()/2+'px');
+			});
+
+			if (jQuery('.pagerblock').size() > 0) {
+				jQuery('.pagerblock').addClass('type_columns1');
+			}
+		});
+		jQuery(window).load(function(){
+			"use strict";
+			setUpWindow();
+		});
+		jQuery(window).resize(function(){
+			"use strict";
+			setUpWindow();
+			setTimeout('setUpWindow()',500);
+			setTimeout('setUpWindow()',1000);
+		});
+		function setUpWindow() {
+			"use strict";
+			main_wrapper.css('min-height', window_h-parseInt(site_wrapper.css('padding-top')) - parseInt(site_wrapper.css('padding-bottom'))+'px');
+		}
+	</script>
 </body>
-
 </html>

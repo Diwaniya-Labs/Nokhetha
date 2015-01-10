@@ -6,11 +6,30 @@ from maps.models import *
 
 
 def index(request):
-    trips_list = Trip.objects.order_by('trip_name')[:5]
     template = loader.get_template('maps/index.html')
     context = RequestContext(request, {
-        'trips_list': trips_list,
     })
+    return HttpResponse(template.render(context))
+
+
+def nokhethas(request):
+    nokhetha_list = Nokhetha.objects.order_by('nokhetha_name')[:5]
+    template = loader.get_template('maps/nokhethas.html')
+    context = RequestContext(request, {
+        'nokhetha_list': nokhetha_list,
+    })
+    return HttpResponse(template.render(context))
+
+
+def nokhetha_detail(request, nokh_id):
+    template = loader.get_template('maps/nokhetha.html')
+    nokh = get_object_or_404(Nokhetha, pk=nokh_id)
+    trips = Trip.objects.filter(nokhetha=nokh)
+    context = RequestContext(request, {
+        'nokhetha': nokh,
+        'nokhetha_trips': trips
+    })
+
     return HttpResponse(template.render(context))
 
 
